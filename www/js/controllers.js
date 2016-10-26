@@ -25,4 +25,18 @@ angular.module('starter.controllers', [])
   $scope.settings = {
     enableFriends: true
   };
-});
+})
+
+.controller('ComicsCtrl', function($scope,$rootScope, ComicsService) {
+
+  ComicsService.getData().success(function(response){
+
+    $scope.comics = response.data.results;
+    console.log($scope.comics);
+
+  }).
+  error(function(data, status, headers, config){
+    console.log("Error al consumir data ");
+  });
+
+})

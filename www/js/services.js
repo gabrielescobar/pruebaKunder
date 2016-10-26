@@ -47,4 +47,30 @@ angular.module('starter.services', [])
       return null;
     }
   };
-});
+})
+
+.factory('ComicsService', function($http, $rootScope, md5) {
+
+  delete $http.defaults.headers.common['X-Requested-With'];
+
+  var keyPublic = $rootScope.key_public;
+  var keyPrivate = $rootScope.key_private;
+  var ts = new Date().getTime();
+  var hash = md5.createHash(ts + keyPrivate + keyPublic);
+  var marvelApi = [];
+
+  marvelApi.getData = function() {
+    return $http({
+      method: 'GET',
+      url: 'http://gateway.marvel.com/v1/public/comics',
+      params: {
+        "ts": ts,
+        "apikey": keyPublic,
+        "hash": hash
+      }
+    });
+  }
+
+  return marvelApi;
+
+})
