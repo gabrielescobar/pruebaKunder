@@ -65,6 +65,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     })
 
+    .state('tab.comics-detail', {
+      url: '/comics/:comicId',
+      views: {
+        'tab-comics': {
+          templateUrl: 'templates/detail-comic.html',
+          controller: 'ComicDetailCtrl'
+        }
+      }
+    })
+
   .state('tab.chats', {
       url: '/chats',
       views: {

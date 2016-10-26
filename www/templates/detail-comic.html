@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<ion-view view-title="Detalle de Comic">
+  <ion-content>
+    <div class="list card" ng-repeat="detail in comicDetail">
+      <div class="item item-avatar">
+        <h2>{{ detail.title }}</h2>
+        <p>Info: {{ detail.format }} - {{ detail.pageCount }} Páginas</p>
+        <p>Fecha: {{detail.dates[0].date | date}}</p>
+        <p>Precio:  {{ detail.prices[0].price | currency }}</p>
+      </div>
+      <div class="item item-body">
+        <div class="row responsive-md" >
+          <div class="col col-25" ng-repeat="image in detail.images">
+            <img ng-src="{{image.path}}.{{image.extension}}" width="100%" />
+          </div>
+        </div>
+        <p>{{ detail.description }}</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

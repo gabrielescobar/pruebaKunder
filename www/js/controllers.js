@@ -29,10 +29,12 @@ angular.module('starter.controllers', [])
 
 .controller('ComicsCtrl', function($scope,$rootScope, ComicsService) {
 
+  console.log("hola");
+
   ComicsService.getData().success(function(response){
 
     $scope.comics = response.data.results;
-    console.log($scope.comics);
+
 
   }).
   error(function(data, status, headers, config){
@@ -40,3 +42,28 @@ angular.module('starter.controllers', [])
   });
 
 })
+
+.controller('ComicDetailCtrl', function($scope, $stateParams, ComicsDetailService,CharactersService) {
+  $scope.comic = $stateParams.comicId;
+  $scope.comic_detail = {};
+
+  ComicsDetailService.getData($scope.comic).success(function(response){
+    $scope.comicDetail = response.data.results;
+    console.log($scope.comicDetail);
+    console.log($scope.comicDetail[0].characters.collectionURI);
+    CharactersService.getData($scope.comicDetail[0].characters.collectionURI).success(function(response){
+      $scope.comicDetail = response.data.results;
+      console.log($scope.comicDetail);
+    }).
+    error(function(data, status, headers, config){
+
+    });
+
+  }).
+  error(function(data, status, headers, config){
+
+  });
+
+
+})
+

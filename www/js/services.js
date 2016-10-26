@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
+  .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
 
   // Some fake testing data
@@ -49,7 +49,7 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('ComicsService', function($http, $rootScope, md5) {
+  .factory('ComicsService', function($http, $rootScope, md5) {
 
   delete $http.defaults.headers.common['X-Requested-With'];
 
@@ -74,3 +74,56 @@ angular.module('starter.services', [])
   return marvelApi;
 
 })
+
+  .factory('ComicsDetailService', function($http, $rootScope, md5) {
+
+    delete $http.defaults.headers.common['X-Requested-With'];
+
+    var keyPublic = $rootScope.key_public;
+    var keyPrivate = $rootScope.key_private;
+    var ts = new Date().getTime();
+    var hash = md5.createHash(ts + keyPrivate + keyPublic);
+    var marvelApi = [];
+
+    marvelApi.getData = function(idComic) {
+      // $http() returns a $promise that we can add handlers with .then()
+      return $http({
+        method: 'GET',
+        url: 'http://gateway.marvel.com/v1/public/comics/'+idComic,
+        params: {
+          "ts": ts,
+          "apikey": keyPublic,
+          "hash": hash
+        }
+      });
+    }
+
+    return marvelApi;
+
+  })
+
+  .factory('CharactersService', function($http, $rootScope, md5){
+
+    delete $http.defaults.headers.common['X-Requested-With'];
+
+    var keyPublic = $rootScope.key_public;
+    var keyPrivate = $rootScope.key_private;
+    var ts = new Date().getTime();
+    var hash = md5.createHash(ts + keyPrivate + keyPublic);
+    var marvelApi = [];
+
+    marvelApi.getData = function(urlCharacters) {
+      return $http({
+        method: 'GET',
+        url: urlCharacters,
+        params: {
+          "ts": ts,
+          "apikey": keyPublic,
+          "hash": hash
+        }
+      });
+    }
+
+    return marvelApi;
+
+  })
