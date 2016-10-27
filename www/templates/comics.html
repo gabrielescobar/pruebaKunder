@@ -1,0 +1,32 @@
+<ion-view view-title="Comics">
+  <ion-content >
+<!--
+ Barra buscadora: busca a la vez por título y por año(solo si se introducen 4 dígitos solamente / restricción del servicio)
+-->
+    <div class="bar bar-header item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-ios-search placeholder-icon"></i>
+        <input type="text" placeholder="Buscar" id="searchText" ng-model="searchText" ng-change="change(this.searchText)">
+      </label>
+    </div>
+    <ion-list >
+<!--
+ Muestro los elementos de cada comic (imagen,Título,Fecha y descrición)
+-->
+      <ion-item  class="item item-thumbnail-left" ng-repeat="comic in comics" type="item-text-wrap" href="#/comics/{{comic.id}}/{{comic.title}}">
+        <img ng-src="{{comic.thumbnail.path}}.{{comic.thumbnail.extension}}">
+        <h2>Título: {{comic.title}}</h2>
+        <h2>Fecha: {{comic.dates[0].date | date}}</h2>
+        <p>Desc: {{comic.description }}</p>
+      </ion-item>
+    </ion-list>
+<!--
+Cada vez que el usuario llegue al fondo de la pantalla llamamos los siguientes 20 elementos con la función loadMore
+-->
+    <ion-infinite-scroll
+      on-infinite="loadMore({{actualPage}})"
+      distance="1%">
+    </ion-infinite-scroll>
+
+  </ion-content>
+</ion-view>

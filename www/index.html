@@ -27,6 +27,7 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <!-- md5 crypto for api marvel -->
     <script src="lib/angular-md5/angular-md5.js"></script>
+    <script src="lib/ionic-ajax-interceptor/dist/ionic-ajax-interceptor.min.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
@@ -35,7 +36,7 @@
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
   </head>
-  <body ng-app="starter">
+  <body ng-app="marvel">
     <!--
       The nav bar that will be updated as we navigate between views.
     -->
@@ -48,6 +49,6 @@
       Templates are in the /templates folder (but you could also
       have templates inline in this html file if you'd like).
     -->
-    <ion-nav-view></ion-nav-view>
+    <ion-nav-view name="comics"></ion-nav-view>
   </body>
 </html>

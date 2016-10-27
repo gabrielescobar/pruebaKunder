@@ -1,11 +1,16 @@
-<ion-view view-title="Detalle de Comic">
+<ion-view view-title="{{name}}">
   <ion-content>
     <div class="list card" ng-repeat="detail in comicDetail">
       <div class="item item-avatar">
-        <h2>{{ detail.title }}</h2>
         <p>Info: {{ detail.format }} - {{ detail.pageCount }} Páginas</p>
         <p>Fecha: {{detail.dates[0].date | date}}</p>
         <p>Precio:  {{ detail.prices[0].price | currency }}</p>
+        <p>Personajes:</p>
+        <ion-list>
+          <ion-item ng-repeat="character in comicCharacters">
+            {{character}}
+          </ion-item>
+        </ion-list>
       </div>
       <div class="item item-body">
         <div class="row responsive-md" >

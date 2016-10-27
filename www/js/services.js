@@ -1,72 +1,28 @@
-angular.module('starter.services', [])
+angular.module('marvel.services', [])
 
-  .factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
-
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
-})
-
+  //Fabrica para la consulta de todos los comics de la aplicación
   .factory('ComicsService', function($http, $rootScope, md5) {
 
+    //elimino elemento del header (doc del api)
   delete $http.defaults.headers.common['X-Requested-With'];
-
   var keyPublic = $rootScope.key_public;
   var keyPrivate = $rootScope.key_private;
   var ts = new Date().getTime();
   var hash = md5.createHash(ts + keyPrivate + keyPublic);
   var marvelApi = [];
 
-  marvelApi.getData = function() {
+    //a través de los parametros de limit y offset indico en la página donde estoy y cuantos
+    //más quier mostrar
+  marvelApi.getData = function(limit,offset) {
     return $http({
       method: 'GET',
       url: 'http://gateway.marvel.com/v1/public/comics',
       params: {
         "ts": ts,
         "apikey": keyPublic,
-        "hash": hash
+        "hash": hash,
+        "limit":limit,
+        "offset": offset
       }
     });
   }
@@ -74,9 +30,64 @@ angular.module('starter.services', [])
   return marvelApi;
 
 })
+  //Fabrica para la consultar los comics por nombre y año a la vez
+  .factory('customComicsService', function($http, $rootScope, md5, $q) {
 
-  .factory('ComicsDetailService', function($http, $rootScope, md5) {
+    //cancelo todas las peticiones en cola, esto ya que si la persona escribe el nombre rapido
+    //por cada letra se esta llamando el servicio, esto hace que cada letra escrita cancele el anterior
+    var canceler = $q.defer();
+    canceler.resolve();
 
+    //evaluo si lo introducido en el input es un número de 4 digitos/ restricción del api
+    function isInt(value) {
+      return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
+    }
+    //elimino elemento del header (doc del api)
+    delete $http.defaults.headers.common['X-Requested-With'];
+
+    var keyPublic = $rootScope.key_public;
+    var keyPrivate = $rootScope.key_private;
+    var ts = new Date().getTime();
+    var hash = md5.createHash(ts + keyPrivate + keyPublic);
+    var marvelApi = [];
+
+    marvelApi.getData = function(search) {
+
+      //arreglo de promesas para busqueda por título y año
+      var promises = [];
+      promises.push($http({
+        method: 'GET',
+        url: 'http://gateway.marvel.com/v1/public/comics',
+        params: {
+          "ts": ts,
+          "apikey": keyPublic,
+          "hash": hash,
+          "titleStartsWith": search
+        }
+      }))
+
+      //si lo introducido es un número de 4 digitos hago la busqueda por año
+      if(isInt(search) && (search.length == 4) ){
+        promises.push( $http({
+        method: 'GET',
+        url: 'http://gateway.marvel.com/v1/public/comics',
+        params: {
+          "ts": ts,
+          "apikey": keyPublic,
+          "hash": hash,
+          "startYear": search
+        }
+      }))
+      }
+      return $q.all(promises);
+    }
+
+    return marvelApi;
+
+  })
+
+  .factory('ComicsDetailService', function($http, $rootScope, md5,$q) {
+    //elimino elemento del header (doc del api)
     delete $http.defaults.headers.common['X-Requested-With'];
 
     var keyPublic = $rootScope.key_public;
@@ -86,8 +97,10 @@ angular.module('starter.services', [])
     var marvelApi = [];
 
     marvelApi.getData = function(idComic) {
-      // $http() returns a $promise that we can add handlers with .then()
-      return $http({
+
+      //arreglo de promesas para la la consulta de los detalles del comic y los personajes de ese comic
+      var promises = [];
+      promises.push($http({
         method: 'GET',
         url: 'http://gateway.marvel.com/v1/public/comics/'+idComic,
         params: {
@@ -95,35 +108,20 @@ angular.module('starter.services', [])
           "apikey": keyPublic,
           "hash": hash
         }
-      });
+      }));
+
+        promises.push( $http({
+          method: 'GET',
+          url: 'http://gateway.marvel.com/v1/public/comics/'+idComic+'/characters',
+          params: {
+            "ts": ts,
+            "apikey": keyPublic,
+            "hash": hash
+          }
+        }))
+
+      return $q.all(promises);
     }
-
     return marvelApi;
-
   })
 
-  .factory('CharactersService', function($http, $rootScope, md5){
-
-    delete $http.defaults.headers.common['X-Requested-With'];
-
-    var keyPublic = $rootScope.key_public;
-    var keyPrivate = $rootScope.key_private;
-    var ts = new Date().getTime();
-    var hash = md5.createHash(ts + keyPrivate + keyPublic);
-    var marvelApi = [];
-
-    marvelApi.getData = function(urlCharacters) {
-      return $http({
-        method: 'GET',
-        url: urlCharacters,
-        params: {
-          "ts": ts,
-          "apikey": keyPublic,
-          "hash": hash
-        }
-      });
-    }
-
-    return marvelApi;
-
-  })
